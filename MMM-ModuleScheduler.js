@@ -101,32 +101,39 @@ Module.register("MMM-ModuleScheduler", {
 		}
 	},
 
-	setModuleDisplay: function(module, action, brightness) {
-        const options = this.config.uselock ? { lockString: this.identifier } : "";
-        Log.log(this.name + " is processing the " + action + (action === "DIM_MODULE" ? " (" + brightness + "%)" : "") + " request for " + module.identifier);
-    
-        if (action === "SHOW_MODULE") {
-            module.show(this.config.animationSpeed, { animation: "fade" }, () => {
-                Log.log(this.name + " has shown " + module.identifier);
-                this.setModuleBrightness(module.identifier, 100);
-            }, options);
-            return true;
-        }
-    
-        if (action === "HIDE_MODULE") {
-            module.hide(this.config.animationSpeed, { animation: "fade" }, () => {
-                Log.log(this.name + " has hidden " + module.identifier);
-            }, options);
-            return true;
-        }
-    
-        if (action === "DIM_MODULE") {
-            this.setModuleBrightness(module.identifier, brightness);
-            return true;
-        }
-    
-        return false;
-    },
+	setModuleDisplay: function (module, action, brightness) {
+		const options = this.config.uselock ? { lockString: this.identifier } : "";
+		Log.log(this.name + " is processing the " + action + (action === "DIM_MODULE" ? " (" + brightness + "%)" : "") + " request for " + module.identifier);
+	
+		if (action === "SHOW_MODULE") {
+			setTimeout(() => {
+				module["show"](
+					this.config.animationSpeed,
+					() => {
+						Log.log(this.name + " has shown " + module.identifier);
+						this.setModuleBrightness(module.identifier, 100);
+					},
+					options
+				);
+			}, 2000); // Add a 2-second delay before showing the module
+			return true;
+		}
+	
+		if (action === "HIDE_MODULE") {
+			setTimeout(() => {
+				module.hide(this.config.animationSpeed, Log.log(this.name + " has hidden " + module.identifier), options);
+			}, 2000); // Add a 2-second delay before hiding the module
+			return true;
+		}
+	
+		if (action === "DIM_MODULE") {
+			this.setModuleBrightness(module.identifier, brightness);
+			return true;
+		}
+	
+		return false;
+	},
+	
     
 	setModuleBrightness(moduleIdentifier, brightness = 100) {
 		const moduleDiv = document.getElementById(moduleIdentifier);
